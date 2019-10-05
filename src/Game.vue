@@ -2,17 +2,19 @@
     <div>
         {{game}} game in progress.
         <div :class="$style.board">
-            <div :class="{[$style.cell]:(cell+Math.trunc((cell-1)/8))%2,[$style.cellAlt]:!((cell+Math.trunc((cell-1)/8))%2)}"
-                 :style="{'grid-row': 1+Math.trunc((cell-1)/8), 'grid-column': 1+(cell)%8}"
-                 v-for="cell in 8*8"
-                 :key="'cell'+cell"></div>
-            <div v-for="(p,i) in pieces" :class="$style['piece'+p.Player]" :key="`piece${i}`" :style="piecePosition(p)">{{p.Kind}}</div>
+            <div :class="{[$style.cellW]:(1+cell+Math.trunc((cell-1)/8))%2,[$style.cellB]:!((1+cell+Math.trunc((cell-1)/8))%2)}" :style="{'grid-row': 1+Math.trunc((cell-1)/8), 'grid-column': 1+(cell)%8}" v-for="cell in 8*8"
+                 :key="'cell'+cell">{{String.fromCharCode('A'.charCodeAt(0)+(cell)%8)}}{{8-Math.trunc((cell-1)/8)}}
+            </div>
+            <Piece v-for="(p,i) in pieces" :piece="p" :key="'piece'+i" @selected="showMoves" @move="movePiece(p, $event)"/>
         </div>
     </div>
 </template>
 
 <script>
+import Piece from './Piece';
+
 export default {
+    components: {Piece},
     props: ['game'],
     data () {
         return {
@@ -25,17 +27,28 @@ export default {
         this.loadData();
     },
     methods: {
-        piecePosition (p) {
-            return {
-                'grid-column': 1 + (p.Position.toLowerCase().charCodeAt(0) - 'a'.charCodeAt(0)),
-                'grid-row': Number(p.Position[1])
-            };
-        },
         loadData () {
             fetch('/api/game/' + this.game).then(game => game.json())
-                .then(game => {
-                    this.pieces = game.Pieces;
-                });
+                .then(game => this.loadDataInternal(game));
+        },
+        loadDataInternal (game) {
+            this.pieces = game.Pieces.map(p => {
+                p.movesShown = false;
+                return p;
+            });
+        },
+        showMoves (vm) {
+            this.pieces.forEach(p => (p.movesShown = false));
+            console.log(vm);
+            vm.piece.movesShown = true;
+        },
+        movePiece (piece, newPos) {
+            fetch('/api/game/' + this.game + '/move/' + piece.Position + '/' + newPos, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: '\"anonymous!\"'
+            }).then(data => data.json())
+                .then(data => this.loadDataInternal(data));
         }
     }
 };
@@ -51,16 +64,20 @@ export default {
     }
 
     .cell {
+        color: #999;
+        font-size: 80%;
+        text-align: right;
+        padding-top: 35px;
+        z-index: 1;
+    }
+
+    .cellW {
+        composes: cell;
         background: #fff;
     }
 
-    .cellAlt {
+    .cellB {
+        composes: cell;
         background: #777;
-    }
-    .pieceWhite{
-        color: green
-    }
-    .pieceBlack{
-        color:red;
     }
 </style>

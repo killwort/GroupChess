@@ -63,18 +63,20 @@ namespace GroupChess
                 return new GameState(id, game, moves);
             });
 
-        public string[] ListGames(string prefix)
+        public Task<string[]> ListGames(string prefix)
         {
             if (string.IsNullOrEmpty(prefix)) prefix = "";
             var gameInfo = _resolver.Resolve($"games/{prefix}".Trim('/'));
             if (!string.IsNullOrEmpty(prefix) && !prefix.EndsWith('/'))
                 prefix = prefix + '/';
             if (!Path.GetFullPath(gameInfo.FullName).StartsWith(Path.GetFullPath(_resolver.Resolve("games").FullName)))
-                return new string[0];
+                return Task.FromResult(new string[0]);
             if (!Directory.Exists(gameInfo.FullName))
-                return new string[0];
-            return Directory.GetFiles(gameInfo.FullName, "*.json", SearchOption.TopDirectoryOnly)
-                .Select(x => prefix + Path.GetFileNameWithoutExtension(x)).ToArray();
+                return Task.FromResult(new string[0]);
+            return Task.FromResult(Directory.GetFiles(gameInfo.FullName, "*.json", SearchOption.TopDirectoryOnly)
+                .Select(x => prefix + Path.GetFileNameWithoutExtension(x)).ToArray());
         }
+
+        public Task Save(GameState gameState)=>SaveGame(gameState);
     }
 }

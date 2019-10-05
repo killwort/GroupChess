@@ -32,5 +32,18 @@ namespace GroupChess
             _chessGame.GetBoard().SelectMany((colPieces, row) => colPieces.Select((piece, col) => (col, row, piece)))
                 .Where(x => x.piece != null)
                 .Select(x => new PieceState(x, _chessGame)).ToArray();
+
+        public bool MakeMove(string @from, string to, string who)
+        {
+            var mt=_chessGame.MakeMove(new Move(from, to, _chessGame.WhoseTurn), false);
+            if ((mt & MoveType.Invalid) != 0) return false;
+            _moves.Add(new StoredMove
+            {
+                FromPosition = from,
+                ToPosition = to,
+                Author = who
+            });
+            return true;
+        }
     }
 }

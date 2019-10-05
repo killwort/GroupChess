@@ -21,9 +21,21 @@ namespace GroupChess
                 Response.StatusCode = 404;
             return g;
         }
+        [HttpPost("game/{id}/move/{from}/{to}")]
+        public async Task<GameState> MakeMove([FromRoute] string id, [FromRoute]string from,[FromRoute] string to, [FromBody]string who)
+        {
+            var g = await _gameStore.GetGame(id);
+            if (string.IsNullOrEmpty(who) || who.Length > 50)
+                who = "Анонимный Анонимщик";
+            if (g == null)
+                Response.StatusCode = 404;
+            g.MakeMove(from, to, who);
+            await _gameStore.Save(g);
+            return g;
+        }
 
         [HttpGet("game")]
-        public async Task<string[]> ListGames(string prefix) => _gameStore.ListGames(prefix);
+        public Task<string[]> ListGames(string prefix) => _gameStore.ListGames(prefix);
 
         [HttpPost("game")]
         public async Task<GameState> NewGame()
