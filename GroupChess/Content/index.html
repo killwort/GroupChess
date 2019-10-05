@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Public Chess</title>
+    <script type="text/javascript">
+        window.__mftLoader=function(mft) {
+            var keys = Object.keys(mft);
+            for (var i = 0; i < keys.length; i++) {
+                var elem;
+                if (mft[keys[i]][0]==='+') { continue; }
+                if (keys[i].substring(keys[i].length - 4) === '.css') {
+                    elem = document.createElement('link');
+                    elem.rel = 'stylesheet';
+                    elem.href = mft[keys[i]];
+                } else {
+                    elem = document.createElement('script');
+                    elem.src = mft[keys[i]];
+                }
+                document.body.appendChild(elem);
+            }
+        }
+    </script>
+</head>
+
+<body>
+<div id=app></div>
+<script src=/manifest.js></script>
+</body>
+</html>

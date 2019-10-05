@@ -1,0 +1,13 @@
+games
+GroupChess/bin
+GroupChess/obj
+GroupChess/Content
+node_modules
+.idea
+.vs
+*.log
+*.lock
+*.user
+*.suo
+
+

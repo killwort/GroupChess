@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "flippingbook",
+    "plugin:vue/essential"
+  ],
+  "rules": {
+    "prefer-promise-reject-errors": "off"
+  },
+  "parserOptions": {
+    "parser": "babel-eslint",
+    "sourceType": "module",
+    "allowImportExportEverywhere": true
+  }
+}
