@@ -1,7 +1,7 @@
 <template>
     <div>Current games in progress:
         <ul>
-            <li v-for="g in games" :key="g"><a :href="`#${g}`" @click.stop.prevent="$emit('load-game',g)">{{g}}</a></li>
+            <li v-for="g in games" :key="g"><a :href="`#${g}`" @click.stop="$emit('load-game',g)">{{g}}</a></li>
         </ul>
     </div>
 </template>
