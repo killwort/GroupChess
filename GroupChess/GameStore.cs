@@ -26,7 +26,13 @@ namespace GroupChess
         {
             var id = Guid.NewGuid().ToString("N");
             _memoryCache.CreateEntry("Game-" + id);
-            var state = new GameState(id, new ChessGame(), new StoredMove[0]);
+            var state = new GameState(id, new ChessGame(), new StoredMove[0])
+            {
+                State = GameStates.InProgress,
+                Started = DateTime.UtcNow,
+                Finished = DateTime.UtcNow,
+                LastMove = DateTime.UtcNow
+            };
             await SaveGame(state);
             return state;
         }
@@ -60,7 +66,10 @@ namespace GroupChess
                         plr = (Player) (((int) plr + 1) % 2);
                         return new Move(x.FromPosition, x.ToPosition, plr, string.IsNullOrEmpty(x.Promotion) ? null : (char?) x.Promotion[0]);
                     }), true);
-                return new GameState(id, game, moves);
+                var rv= new GameState(id, game, moves);
+                rv.Started = gameInfo.CreationTimeUtc;
+                rv.CalculateState();
+                return rv;
             });
 
         public Task<string[]> ListGames(string prefix)

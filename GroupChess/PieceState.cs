@@ -11,7 +11,7 @@ namespace GroupChess
         {
             Kind = pieceOnBoard.piece.GetFenCharacter().ToString();
             Player = pieceOnBoard.piece.Owner;
-            Position = $"{(char)('a' + pieceOnBoard.col)}{8-pieceOnBoard.row}";
+            Position = $"{(char)('A' + pieceOnBoard.col)}{8-pieceOnBoard.row}";
             PossibleMoves = pieceOnBoard.piece.GetValidMoves(new Position(Position), false, game, game.IsValidMove).Select(x => 
                 $"{x.NewPosition}{(x.Promotion.HasValue?"+":"")}"
                 ).Distinct().ToArray();

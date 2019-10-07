@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ChessDotNet;
@@ -24,6 +25,11 @@ namespace GroupChess
         }
 
         public string GameId { get; set; }
+        public DateTime Started { get; set; }
+        public DateTime Finished { get; set; }
+        public DateTime LastMove { get; set; }
+        public GameStates State { get; set; }
+        public IEnumerable<StoredMove> Moves => _moves;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public Player CurrentPlayer => _chessGame.WhoseTurn;
@@ -44,7 +50,22 @@ namespace GroupChess
                 Author = who,
                 Promotion = promotion
             });
+            CalculateState();
             return true;
+        }
+
+        public void CalculateState()
+        {
+            LastMove = _moves.Count == 0 ? Started : _moves.Last().Timestamp;
+            if (_chessGame.IsCheckmated(Player.Black) || _chessGame.IsCheckmated(Player.White))
+                State = GameStates.Checkmate;
+            else if(_chessGame.IsStalemated(Player.Black)||_chessGame.IsStalemated(Player.White))
+                State = GameStates.Stalemate;
+            else if (_chessGame.IsDraw())
+                State = GameStates.Draw;
+            else State = GameStates.InProgress;
+            if (State != GameStates.InProgress)
+                Finished = LastMove;
         }
     }
 }

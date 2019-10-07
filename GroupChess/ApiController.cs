@@ -1,3 +1,6 @@
+using System;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +21,20 @@ namespace GroupChess
         {
             var g = await _gameStore.GetGame(id);
             if (g == null)
+            {
                 Response.StatusCode = 404;
+                return null;
+            }
+
+            if (Request.Headers["If-Modified-Since"].Any())
+            {
+                var ims = DateTime.ParseExact(Request.Headers["If-Modified-Since"], "R", CultureInfo.InvariantCulture);
+                if (ims >= g.LastMove.AddMilliseconds(-g.LastMove.Millisecond-1))
+                {
+                    Response.StatusCode = 304;
+                    return null;
+                }
+            }
             return g;
         }
         [HttpPost("game/{id}/move/{from}/{to}/{promotion?}")]

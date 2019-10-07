@@ -11,4 +11,9 @@
       <PackageReference Include="FB.Web.Utils.App" Version="1.0.0.45" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>

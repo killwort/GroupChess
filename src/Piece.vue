@@ -56,5 +56,6 @@ export default {
         background: green;
         opacity:.5;
         z-index:3;
+        cursor:pointer;
     }
 </style>
