@@ -5,6 +5,7 @@ using Autofac.Features.Metadata;
 using FB.Annotations;
 using FB.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 
 namespace GroupChess
 {
@@ -21,7 +22,7 @@ namespace GroupChess
         public ActionResult Index()
         {
             var info = _rootResolver.Resolve(Path.Combine("Content", "index.html"));
-            return new PhysicalFileResult(info.FullName, "text/html");
+            return new PhysicalFileResult(info.FullName,"text/html; charset=utf-8");
         }
         [Route("/{path:regex(\\.(js|html|css)$)}", Order = int.MaxValue)]
         public IActionResult StaticContent(string path) {
@@ -32,13 +33,13 @@ namespace GroupChess
                     case ".cshtml":
                         return NotFound();
                     case ".js":
-                        ctype = "text/javascript";
+                        ctype = "text/javascript; charset=utf-8";
                         break;
                     case ".css":
-                        ctype = "text/css";
+                        ctype = "text/css; charset=utf-8";
                         break;
                     case ".html":
-                        ctype = "text/html";
+                        ctype = "text/html; charset=utf-8";
                         break;
                 }
 

@@ -36,9 +36,7 @@ export default {
 
     .piece {
         font-weight: bold;
-        font-size: 36px;
         text-align: center;
-        line-height: 48px;
         cursor: pointer;
         z-index:2;
     }

@@ -7,8 +7,12 @@
             <Piece v-for="(p,i) in pieces" :piece="p" :key="'piece'+i" @selected="showMoves" @move="movePiece(p, $event)"/>
         </div>
         <div :class="$style.moves">
-            <ol>
-                <li v-for="(m,i) in gameState.Moves" :key="i">{{m.Timestamp | formatDate('LLL')}} {{m.FromPosition}}-{{m.ToPosition}} {{m.Author}}</li>
+            <ol v-if="gameState">
+                <li v-for="(m,i) in gameState.Moves" :key="i">{{m.Timestamp | formatDate('LT')}} {{symbols[m.MovedPiece]}} {{m.FromPosition}}-{{m.ToPosition}}
+                    <template v-if="m.TakenPiece">&#215; {{symbols[m.TakenPiece]}}</template>
+                    <template v-if="m.Promotion">&#8657; {{symbols[m.Promotion]}}</template>
+                    @{{m.Author}}
+                </li>
             </ol>
         </div>
         <div v-if="showPromotions" :class="$style.promotionOverlay">
@@ -34,7 +38,8 @@ export default {
             currentPlayer: null,
             showPromotions: null,
             symbols,
-            interval: null
+            interval: null,
+            gameState: null
         };
     },
     beforeDestroy () {
@@ -113,33 +118,51 @@ export default {
 </script>
 
 <style module>
-    .twocol{
-        display:flex;
+    .twocol {
+        display: flex;
         flex-direction: row;
         position: absolute;
-        top:0;
-        left:0;
-        right:0;
-        bottom:0;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
     }
-    .moves{
-        overflow-y:auto;
+
+    .moves {
+        overflow-y: auto;
         padding: 1em 3em;
     }
+
     .board {
         align-self: center;
-        width: auto;
         display: grid;
-        grid-template-columns: repeat(8, 48px);
-        grid-template-rows: repeat(8, 48px);
+        grid-template-columns: repeat(8, 1fr);
+        grid-auto-rows: 1fr;
+        width:45%;
+        line-height: 5.5vw;
+        font-size: 4vw;
         margin: 0 auto;
+    }
+
+    .board::before {
+        content: '';
+        width: 0;
+        padding-bottom: 100%;
+        grid-row: 1 / 1;
+        grid-column: 1 / 1;
+    }
+
+    .board > *:first-child {
+        grid-row: 1 / 1;
+        grid-column: 1 / 1;
     }
 
     .cell {
         color: #999;
-        font-size: 80%;
+        font-size: 1vw;
+        line-height: 1vw;
         text-align: right;
-        padding-top: 35px;
+        padding-top: 4vw;
         z-index: 1;
     }
 

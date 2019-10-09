@@ -39,16 +39,19 @@ namespace GroupChess
                 .Where(x => x.piece != null)
                 .Select(x => new PieceState(x, _chessGame)).ToArray();
 
-        public bool MakeMove(string @from, string to, string who, string promotion)
-        {
-            var mt = _chessGame.MakeMove(new Move(from, to, _chessGame.WhoseTurn, string.IsNullOrEmpty(promotion) ? null : (char?) promotion[0]), false);
+        public bool MakeMove(string from, string to, string who, string promotion) {
+            var piece = _chessGame.GetPieceAt(new Position(from));
+            var mt = _chessGame.MakeMove(new Move(from, to, _chessGame.WhoseTurn, string.IsNullOrEmpty(promotion) ? null : (char?) promotion[0]), false, out var targetPiece);
             if ((mt & MoveType.Invalid) != 0) return false;
             _moves.Add(new StoredMove
             {
                 FromPosition = from,
                 ToPosition = to,
                 Author = who,
-                Promotion = promotion
+                Promotion = promotion,
+                MovedPiece = piece.GetFenCharacter().ToString(),
+                TakenPiece = targetPiece?.GetFenCharacter().ToString(),
+                Check = _chessGame.IsInCheck(Player.Black)|_chessGame.IsInCheck(Player.White)
             });
             CalculateState();
             return true;

@@ -37,6 +37,19 @@ namespace GroupChess
             }
             return g;
         }
+
+        [HttpDelete("game/{id}")]
+        public async Task DeleteGame([FromRoute] string id) {
+            var g = await _gameStore.GetGame(id);
+            if (g == null)
+            {
+                Response.StatusCode = 404;
+                return;
+            }
+
+            await _gameStore.DeleteGame(g);
+        }
+
         [HttpPost("game/{id}/move/{from}/{to}/{promotion?}")]
         public async Task<GameState> MakeMove([FromRoute] string id, [FromRoute]string from,[FromRoute] string to, [FromBody]string who, [FromRoute] string promotion)
         {
@@ -58,10 +71,10 @@ namespace GroupChess
         public Task<string[]> ListGames(string prefix) => _gameStore.ListGames(prefix);
 
         [HttpPost("game")]
-        public async Task<GameState> NewGame()
+        public async Task<string> NewGame()
         {
             var g = await _gameStore.NewGame();
-            return g;
+            return g.GameId;
         }
     }
 }

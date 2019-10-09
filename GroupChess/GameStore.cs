@@ -87,5 +87,19 @@ namespace GroupChess
         }
 
         public Task Save(GameState gameState)=>SaveGame(gameState);
+
+        /*public async Task MoveGame(GameState game, string destination) {
+            if (string.IsNullOrEmpty(destination)) destination = "archive";
+            var destinationInfo = _resolver.Resolve($"games/{destination}".Trim('/'));
+            if (!Path.GetFullPath(destinationInfo.FullName).StartsWith(Path.GetFullPath(_resolver.Resolve("games").FullName)))
+                return;
+            if (!Directory.Exists(destinationInfo.FullName))
+                Directory.CreateDirectory(destinationInfo.FullName);
+            File.Move(_resolver.Resolve("games/" + game.GameId + ".json").FullName, Path.Combine(destinationInfo.FullName, game.GameId));
+        }*/
+        public async Task DeleteGame(GameState game) {
+            File.Delete(_resolver.Resolve("games/" + game.GameId + ".json").FullName);
+            _memoryCache.Remove("Game-" + game.GameId);
+        }
     }
 }
