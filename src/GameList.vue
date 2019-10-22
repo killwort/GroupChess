@@ -23,42 +23,42 @@
     </div>
 </template>
 <script>
-    export default {
-        data() {
-            return {
-                games: [],
-                myName: localStorage.getItem('MyChessName')
-            };
+export default {
+    data () {
+        return {
+            games: [],
+            myName: localStorage.getItem('MyChessName')
+        };
+    },
+    created () {
+        fetch('api/game').then(games => {
+            games.json().then(gamesO => (this.games = gamesO));
+        });
+    },
+    methods: {
+        saveName () {
+            this.myName = this.$refs.myName.value;
+            localStorage.setItem('MyChessName', this.myName);
         },
-        created() {
-            fetch(window.__prefix + '/api/game').then(games => {
-                games.json().then(gamesO => (this.games = gamesO));
+        deleteGame (g) {
+            fetch('api/game/' + g.GameId, {
+                method: 'DELETE'
+            }).then(_ => {
+                this.games.splice(this.games.indexOf(g), 1);
             });
         },
-        methods: {
-            saveName() {
-                this.myName = this.$refs.myName.value;
-                localStorage.setItem('MyChessName', this.myName);
-            },
-            deleteGame(g) {
-                fetch(window.__prefix + '/api/game/' + g.GameId, {
-                    method: 'DELETE'
-                }).then(gg => {
-                    this.games.splice(this.games.indexOf(g), 1);
+        newGame () {
+            fetch('api/game', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            }).then(g => g.text())
+                .then(g => {
+                    this.$emit('load-game', g);
+                    window.location.hash = '#' + g;
                 });
-            },
-            newGame() {
-                fetch(window.__prefix + '/api/game', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'}
-                }).then(g => g.text())
-                    .then(g => {
-                        this.$emit('load-game', g);
-                        window.location.hash='#'+g;
-                    });
-            }
         }
-    };
+    }
+};
 </script>
 <style module>
     .badge {

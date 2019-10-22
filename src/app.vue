@@ -1,7 +1,7 @@
 <template>
     <div :class="$style.wrapper">
         <GameList v-if="!activeGame" @load-game="activeGame=$event" />
-        <Game v-if="activeGame" :game="activeGame"/>
+        <Game v-if="activeGame" :game="activeGame" @unload-game="activeGame=null"/>
     </div>
 </template>
 <script>
@@ -18,7 +18,7 @@ export default {
     },
     created () {
         if (window.location.hash !== '') { this.activeGame = window.location.hash.substring(1); }
-        fetch(window.__prefix +'/api/game').then(games => {
+        fetch('api/game').then(games => {
             games.json().then(gamesO => (this.games = gamesO));
         });
     }
@@ -31,5 +31,6 @@ export default {
         left: 0;
         right: 0;
         bottom: 0;
+        font-family: Calibri, sans-serif;
     }
 </style>

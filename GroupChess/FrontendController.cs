@@ -27,7 +27,6 @@ namespace GroupChess
         }
         [Route("/{*path:regex(\\.(js|html|css)$)}", Order = int.MaxValue)]
         public IActionResult StaticContent(string path) {
-            Console.WriteLine($"Requested {path}");
             var info = _rootResolver.Resolve(Path.Combine("Content", path));
             if (info.Exists && info.FullName.StartsWith(_rootResolver.Resolve("Content").FullName)) {
                 var ctype = "application/octet-stream";

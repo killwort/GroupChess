@@ -3,7 +3,6 @@
 <head>
     <title>Public Chess</title>
     <script type="text/javascript">
-        window.__prefix = '/chess';
         window.__mftLoader = function (mft) {
             var keys = Object.keys(mft);
             for (var i = 0; i < keys.length; i++) {
@@ -14,10 +13,10 @@
                 if (keys[i].substring(keys[i].length - 4) === '.css') {
                     elem = document.createElement('link');
                     elem.rel = 'stylesheet';
-                    elem.href = window.__prefix + mft[keys[i]];
+                    elem.href = mft[keys[i]];
                 } else {
                     elem = document.createElement('script');
-                    elem.src = window.__prefix + mft[keys[i]];
+                    elem.src = mft[keys[i]];
                 }
                 document.body.appendChild(elem);
             }
@@ -27,6 +26,6 @@
 
 <body>
 <div id="app"></div>
-<script src="/chess/manifest.js"></script>
+<script src="manifest.js"></script>
 </body>
 </html>

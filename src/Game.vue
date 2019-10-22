@@ -1,19 +1,35 @@
 <template>
     <div :class="$style.twocol">
-        <div :class="$style.board">
-            <div :class="{[$style.cellW]:(1+cell+Math.trunc((cell-1)/8))%2,[$style.cellB]:!((1+cell+Math.trunc((cell-1)/8))%2)}" :style="{'grid-row': 1+Math.trunc((cell-1)/8), 'grid-column': 1+(cell)%8}" v-for="cell in 8*8"
-                 :key="'cell'+cell">{{String.fromCharCode('A'.charCodeAt(0)+(cell)%8)}}{{8-Math.trunc((cell-1)/8)}}
+        <div :class="$style.boardCol">
+            <h3>{{gameState && gameState.Name}}</h3>
+            <div :class="$style.board">
+                <div :class="{[$style.cellW]:(1+cell+Math.trunc((cell-1)/8))%2,[$style.cellB]:!((1+cell+Math.trunc((cell-1)/8))%2)}"
+                     :style="{'grid-row': 1+Math.trunc((cell-1)/8), 'grid-column': 1+(cell)%8}" v-for="cell in 8*8"
+                     :key="'cell'+cell">{{String.fromCharCode('A'.charCodeAt(0)+(cell)%8)}}{{8-Math.trunc((cell-1)/8)}}
+                </div>
+                <Piece v-for="(p,i) in pieces" :piece="p" :key="'piece'+i" @selected="showMoves"
+                       @move="movePiece(p, $event)"/>
             </div>
-            <Piece v-for="(p,i) in pieces" :piece="p" :key="'piece'+i" @selected="showMoves" @move="movePiece(p, $event)"/>
         </div>
         <div :class="$style.moves">
-            <ol v-if="gameState">
-                <li v-for="(m,i) in gameState.Moves" :key="i">{{m.Timestamp | formatDate('LT')}} {{symbols[m.MovedPiece]}} {{m.FromPosition}}-{{m.ToPosition}}
-                    <template v-if="m.TakenPiece">&#215; {{symbols[m.TakenPiece]}}</template>
-                    <template v-if="m.Promotion">&#8657; {{symbols[m.Promotion]}}</template>
-                    @{{m.Author}}
+            <ol :class="$style.moveList" v-if="gameState">
+                <li v-for="(m,i) in gameState.Moves" :key="i">
+                    <span :class="$style.time">{{m.Timestamp | formatDate('LT')}}</span>
+                    <span :class="$style.piece">{{symbols[m.MovedPiece]}}</span>
+                    <span :class="$style.positions">{{m.FromPosition}}-{{m.ToPosition}}</span>
+                    <span :class="$style.taken" v-if="m.TakenPiece">&#215; <span :class="$style.piece">{{symbols[m.TakenPiece]}}</span></span>
+                    <span :class="$style.promoted" v-if="m.Promotion">&#8657; <span :class="$style.piece">{{symbols[m.Promotion]}}</span></span>
+                    <span :class="$style.check" v-if="m.Check">!</span>
+                    <span :class="$style.author">@{{m.Author}}</span>
                 </li>
             </ol>
+            <h3 :class="$style.status">{{currentPlayer}}'s turn now</h3>
+            <h2 :class="$style.status" v-if="gameState && gameState.Moves.length && gameState.Moves[gameState.Moves.length-1].Check">
+                CHECK!</h2>
+            <h1 :class="$style.status" v-if="gameState && gameState.State=='Checkmate'">CHECKMATE!</h1>
+            <h1 :class="$style.status" v-if="gameState && gameState.State=='Stalemate'">STALEMATE!</h1>
+            <h1 :class="$style.status" v-if="gameState && gameState.State=='Draw'">DRAW!</h1>
+            <a :class="$style.status" href="#" @click="$emit('unload-game')">Back to game selection</a>
         </div>
         <div v-if="showPromotions" :class="$style.promotionOverlay">
             <span></span>
@@ -64,7 +80,7 @@ export default {
                 clearTimeout(this.interval);
                 return;
             }
-            fetch(window.__prefix + '/api/game/' + this.game, {
+            fetch('api/game/' + this.game, {
                 headers: {
                     'If-Modified-Since': moment.utc(this.gameState.LastMove).utc().format('ddd, DD MMM YYYY HH:mm:ss') + ' GMT'
                 }
@@ -82,7 +98,7 @@ export default {
                 });
         },
         loadData () {
-            fetch(window.__prefix + '/api/game/' + this.game).then(game => game.json())
+            fetch('api/game/' + this.game).then(game => game.json())
                 .then(game => this.loadDataInternal(game));
         },
         loadDataInternal (game) {
@@ -90,6 +106,7 @@ export default {
                 p.movesShown = false;
                 return p;
             });
+            document.title = 'Public Chess - ' + game.Name;
             this.gameState = game;
             this.currentPlayer = game.CurrentPlayer;
         },
@@ -102,10 +119,10 @@ export default {
                 this.showPromotions = {piece, newPos: newPos.substring(0, 2)};
                 return;
             }
-            fetch(window.__prefix + '/api/game/' + this.game + '/move/' + piece.Position + '/' + newPos + (promotion ? '/' + promotion : ''), {
+            fetch('api/game/' + this.game + '/move/' + piece.Position + '/' + newPos + (promotion ? '/' + promotion : ''), {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body:JSON.stringify(localStorage.getItem('MyChessName'))
+                body: JSON.stringify(localStorage.getItem('MyChessName'))
             }).then(data => data.json())
                 .then(data => this.loadDataInternal(data));
         },
@@ -131,14 +148,20 @@ export default {
     .moves {
         overflow-y: auto;
         padding: 1em 3em;
+        min-width: 15%;
     }
 
+    .boardCol {
+        text-align: center;
+        width: 45%;
+        margin: 0 auto;
+    }
     .board {
         align-self: center;
         display: grid;
         grid-template-columns: repeat(8, 1fr);
         grid-auto-rows: 1fr;
-        width:45%;
+        width: 100%;
         line-height: 5.5vw;
         font-size: 4vw;
         margin: 0 auto;
@@ -162,7 +185,7 @@ export default {
         font-size: 1vw;
         line-height: 1vw;
         text-align: right;
-        padding-top: 4vw;
+        padding-top: 4.5vw;
         z-index: 1;
     }
 
@@ -194,8 +217,43 @@ export default {
         grid-row: 2;
     }
 
+    .moveList{
+        padding-left: 1em;
+    }
+
     .promotion {
         cursor: pointer;
         background: white;
+    }
+
+    .time {
+
+    }
+
+    .piece {
+        font-size: 150%;
+    }
+
+    .positions {
+        font-family: "Lucida Console", monospace;
+    }
+
+    .check {
+
+    }
+
+    .author {
+
+    }
+
+    .taken {
+
+    }
+
+    .promoted {
+
+    }
+    .status{
+        text-align: center;
     }
 </style>

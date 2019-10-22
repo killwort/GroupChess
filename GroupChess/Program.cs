@@ -2,12 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using Autofac;
-using FB.Discovery;
-using FB.Settings;
 using FB.Web.Utils.App;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace GroupChess
 {
@@ -22,21 +17,5 @@ namespace GroupChess
             using (var gs = new GZipStream(fs, CompressionMode.Decompress))
                 builder.RegisterInstance(NamingChain = new MarkovChain(gs));
         }
-
-        public override void Configure(IApplicationBuilder app,
-                                       IHostingEnvironment env,
-                                       ILoggerFactory loggerFactory,
-                                       IApplicationLifetime lifetime,
-                                       IDiscoveryService discovery,
-                                       Settings<DeploymentSettings> deploymentSettings,
-                                       Settings<CorsSettings> corsSettings) {
-            app.Use(
-                async (context, next) => {
-                    Console.WriteLine(context.Request.Path);
-                    await next.Invoke();
-                });
-            base.Configure(app, env, loggerFactory, lifetime, discovery, deploymentSettings, corsSettings);
-        }
-
     }
 }

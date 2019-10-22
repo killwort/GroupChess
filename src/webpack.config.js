@@ -16,7 +16,7 @@ const entries = {
 module.exports = function (env, argv) {
     env = _.extend({
         conf: 'debug',
-        cdn: '/'
+        cdn: ''
     }, env);
     const conf = {
         stats: {children: false},
