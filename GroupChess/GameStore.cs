@@ -61,11 +61,16 @@ namespace GroupChess
                 var plr = Player.Black;
                 var game = moves.Length == 0
                     ? new ChessGame()
-                    : new ChessGame(moves.Select(x =>
-                    {
-                        plr = (Player) (((int) plr + 1) % 2);
-                        return new Move(x.FromPosition, x.ToPosition, plr, string.IsNullOrEmpty(x.Promotion) ? null : (char?) x.Promotion[0]);
-                    }), true);
+                    : new ChessGame(
+                        moves.Select(
+                            x => {
+                                var movePlayer = plr = (Player) (((int) plr + 1) % 2);
+                                return new Move(x.FromPosition, x.ToPosition, movePlayer, string.IsNullOrEmpty(x.Promotion) ? null : (char?) x.Promotion[0]);
+                            }
+                        ).ToArray(),
+                        false
+                    );
+                
                 var rv= new GameState(id, game, moves);
                 rv.Started = gameInfo.CreationTimeUtc;
                 rv.CalculateState();

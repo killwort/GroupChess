@@ -30,18 +30,22 @@ namespace GroupChess {
                 if (_name != null) return _name;
                 if (!BigInteger.TryParse(GameId, NumberStyles.HexNumber, null, out var entropy))
                     entropy = new BigInteger(Guid.NewGuid().ToByteArray());
-                return (_name = string.Join(
-                    " ",
-                    Program.NamingChain.Value(
-                        max => {
-                            var rv = (int) (entropy % max);
-                            entropy /= max;
-                            return rv;
-                        },
-                        10,
-                        20
-                    )
-                ));
+                while (string.IsNullOrEmpty(_name)) {
+                    _name = string.Join(
+                        " ",
+                        Program.NamingChain.Value(
+                            max => {
+                                var rv = (int) (entropy % max);
+                                entropy /= max;
+                                return rv;
+                            },
+                            10,
+                            20
+                        )
+                    );
+                }
+
+                return _name;
             }
         }
 
