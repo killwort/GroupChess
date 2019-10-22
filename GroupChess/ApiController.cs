@@ -68,7 +68,7 @@ namespace GroupChess
         }
 
         [HttpGet("game")]
-        public Task<string[]> ListGames(string prefix) => _gameStore.ListGames(prefix);
+        public Task<GameState[]> ListGames(string prefix) => _gameStore.ListGames(prefix);
 
         [HttpPost("game")]
         public async Task<string> NewGame()

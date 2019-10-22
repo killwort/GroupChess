@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,8 +25,9 @@ namespace GroupChess
             var info = _rootResolver.Resolve(Path.Combine("Content", "index.html"));
             return new PhysicalFileResult(info.FullName,"text/html; charset=utf-8");
         }
-        [Route("/{path:regex(\\.(js|html|css)$)}", Order = int.MaxValue)]
+        [Route("/{*path:regex(\\.(js|html|css)$)}", Order = int.MaxValue)]
         public IActionResult StaticContent(string path) {
+            Console.WriteLine($"Requested {path}");
             var info = _rootResolver.Resolve(Path.Combine("Content", path));
             if (info.Exists && info.FullName.StartsWith(_rootResolver.Resolve("Content").FullName)) {
                 var ctype = "application/octet-stream";

@@ -18,7 +18,7 @@ export default {
     },
     created () {
         if (window.location.hash !== '') { this.activeGame = window.location.hash.substring(1); }
-        fetch('/api/game').then(games => {
+        fetch(window.__prefix +'/api/game').then(games => {
             games.json().then(gamesO => (this.games = gamesO));
         });
     }

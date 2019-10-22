@@ -64,7 +64,7 @@ export default {
                 clearTimeout(this.interval);
                 return;
             }
-            fetch('/api/game/' + this.game, {
+            fetch(window.__prefix + '/api/game/' + this.game, {
                 headers: {
                     'If-Modified-Since': moment.utc(this.gameState.LastMove).utc().format('ddd, DD MMM YYYY HH:mm:ss') + ' GMT'
                 }
@@ -82,7 +82,7 @@ export default {
                 });
         },
         loadData () {
-            fetch('/api/game/' + this.game).then(game => game.json())
+            fetch(window.__prefix + '/api/game/' + this.game).then(game => game.json())
                 .then(game => this.loadDataInternal(game));
         },
         loadDataInternal (game) {
@@ -102,10 +102,10 @@ export default {
                 this.showPromotions = {piece, newPos: newPos.substring(0, 2)};
                 return;
             }
-            fetch('/api/game/' + this.game + '/move/' + piece.Position + '/' + newPos + (promotion ? '/' + promotion : ''), {
+            fetch(window.__prefix + '/api/game/' + this.game + '/move/' + piece.Position + '/' + newPos + (promotion ? '/' + promotion : ''), {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: '"anonymous!"'
+                body:JSON.stringify(localStorage.getItem('MyChessName'))
             }).then(data => data.json())
                 .then(data => this.loadDataInternal(data));
         },
