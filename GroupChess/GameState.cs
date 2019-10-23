@@ -30,6 +30,8 @@ namespace GroupChess {
                 if (_name != null) return _name;
                 if (!BigInteger.TryParse(GameId, NumberStyles.HexNumber, null, out var entropy))
                     entropy = new BigInteger(Guid.NewGuid().ToByteArray());
+                if (entropy < 0)
+                    entropy = -entropy;
                 while (string.IsNullOrEmpty(_name)) {
                     _name = string.Join(
                         " ",
